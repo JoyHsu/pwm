@@ -31,7 +31,13 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 
+#define PWM_MOTOR_MIN 0
+#define PWM_MOTOR_MAX 65535
 
+#define PWM_Motor1 TIM4->CCR1   // 無刷 PWM
+#define PWM_Motor2 TIM4->CCR2   // 無刷 PWM
+#define PWM_Motor3 TIM4->CCR3   // 無刷 PWM
+#define PWM_Motor4 TIM4->CCR4   // 無刷 PWM
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
@@ -59,6 +65,12 @@ int main(void)
   TIM_Configuration();
   GPIO_Configuration();
 
+
+  Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
+
+  for(i=0;i<15000;i++);  
+
+  Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
   
   while(1)  // Do not exit
   {
@@ -96,7 +108,25 @@ int main(void)
   return(0); // System will implode
 }   
   
-  
+void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
+{
+	if(Motor1>PWM_MOTOR_MAX)      Motor1 = PWM_MOTOR_MAX;
+	else if(Motor1<PWM_MOTOR_MIN) Motor1 = PWM_MOTOR_MIN;
+		
+	if(Motor2>PWM_MOTOR_MAX)      Motor2 = PWM_MOTOR_MAX;
+	else if(Motor2<PWM_MOTOR_MIN) Motor2 = PWM_MOTOR_MIN;
+				
+	if(Motor3>PWM_MOTOR_MAX)      Motor3 = PWM_MOTOR_MAX;
+	else if(Motor3<PWM_MOTOR_MIN) Motor3 = PWM_MOTOR_MIN;
+						
+	if(Motor4>PWM_MOTOR_MAX)      Motor4 = PWM_MOTOR_MAX;
+	else if(Motor4<PWM_MOTOR_MIN) Motor4 = PWM_MOTOR_MIN;
+								
+	PWM_Motor1 = Motor1;
+	PWM_Motor2 = Motor2;
+	PWM_Motor3 = Motor3;
+	PWM_Motor4 = Motor4;
+}
 
 /**
   * @brief  Configures the different system clocks.
