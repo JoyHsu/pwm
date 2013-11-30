@@ -1,4 +1,4 @@
-/**
+/*
   ******************************************************************************
   * @file    main.c 
   * @author  MCD Application Team
@@ -31,8 +31,9 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 
-#define PWM_MOTOR_MIN 0
-#define PWM_MOTOR_MAX 65535
+#define PWM_MOTOR_MIN 100
+#define PWM_MOTOR_MAX 1000
+#define TEST 200
 
 #define PWM_Motor1 TIM4->CCR1   // 無刷 PWM
 #define PWM_Motor2 TIM4->CCR2   // 無刷 PWM
@@ -65,28 +66,28 @@ int main(void)
   TIM_Configuration();
   GPIO_Configuration();
 
+  Delay_1ms(40000000);
 
   Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
 
-  for(i=0;i<15000;i++);  
+  Delay_1ms(50000000);  
 
   Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
   
+  Delay_1ms(50000000); 
+
   while(1)  // Do not exit
   {
-  
-    if(brightness + n <= 0)
-        who_run = (who_run + 1) % 4; 
+   Motor_Control(TEST, TEST, TEST, TEST);
+   
+   Delay_1ms(50000000);
 
-    if (((brightness + n) >= 3000) || ((brightness + n) <= 0))
-      n = -n; // if  brightness maximum/maximum change direction
-    
-    brightness += n;
-    TIM4->CCR1 = brightness - 1;
-    TIM4->CCR2 = brightness - 1;
-    TIM4->CCR3 = brightness - 1;
-    TIM4->CCR4 = brightness - 1;
-    
+   Motor_Control(TEST+50, TEST+50, TEST+50, TEST+50);
+
+   Delay_1ms(50000000);
+
+
+
     //Light LEDs in turn
     // switch(who_run){
     //     case 0:
@@ -102,11 +103,19 @@ int main(void)
     //         TIM4->CCR4 = brightness - 1; // set brightness
     //         break;
     // }
-    for(i=0;i<15000;i++);  // delay
+
   }
  
   return(0); // System will implode
-}   
+} 
+
+
+void Delay_1ms( vu32 nCnt_1ms )
+{
+    u32 nCnt;
+	  for(; nCnt_1ms != 0; nCnt_1ms--)
+		    for(nCnt = 56580; nCnt != 0; nCnt--);
+}
   
 void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
 {
@@ -179,7 +188,7 @@ void TIM_Configuration(void)
     // Solving for prescaler gives 240.
     TIM_TimeBaseStructInit( &TIM_TimeBaseInitStruct );
     TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV4;
-    TIM_TimeBaseInitStruct.TIM_Period = 1680 - 1;   
+    TIM_TimeBaseInitStruct.TIM_Period = 3360 - 1;   
     TIM_TimeBaseInitStruct.TIM_Prescaler = 500 - 1; 
     TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;    
     TIM_TimeBaseInit( TIM4, &TIM_TimeBaseInitStruct );
@@ -190,7 +199,7 @@ void TIM_Configuration(void)
     
     // Initial duty cycle equals 0%. Value can range from zero to 65535.
     //TIM_Pulse = TIM4_CCR1 register (16 bits)
-    TIM_OCInitStruct.TIM_Pulse = 65535; //(0=Always Off, 65535=Always On)
+    TIM_OCInitStruct.TIM_Pulse = 0; //(0=Always Off, 65535=Always On)
  
     TIM_OC1Init( TIM4, &TIM_OCInitStruct ); // Channel 1  LED
     TIM_OC2Init( TIM4, &TIM_OCInitStruct ); // Channel 2  LED
